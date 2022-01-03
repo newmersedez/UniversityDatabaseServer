@@ -2,7 +2,7 @@ import psycopg2
 from source.config import config
 
 
-def connect():
+def connect(scriptpath : str):
     conn = None
     try:
         # read connection parameters

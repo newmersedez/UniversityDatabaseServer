@@ -1,4 +1,3 @@
-from source.connect import *
 from source.server import *
 
 if __name__ == '__main__':
