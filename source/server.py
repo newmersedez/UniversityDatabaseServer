@@ -17,9 +17,13 @@ class Server:
             conn, addr = s.accept()
             with conn:
                 print('Connected by', addr)
-                connect()
-                # while True:
-                #     data = conn.recv(1024)
-                #     if not data:
-                #         break
-                #     conn.sendall(data)
+                while True:
+                    try:
+                        data = conn.recv(1024)
+                        if not data:
+                            break
+                        print(data)
+                    except ConnectionError:
+                        pass
+                    except KeyboardInterrupt:
+                        print("press control-c again to quit")
