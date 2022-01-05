@@ -1,6 +1,7 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from os import getpid
 from source.connect import *
+from source.request import *
 from types import SimpleNamespace
 import json
 
@@ -23,28 +24,29 @@ class Server:
                 print('Connected by', addr)
                 while True:
                     try:
-                        data = conn.recv(1024)
-                        if not data:
+                        recvBytes = conn.recv(1024)
+                        if not recvBytes:
                             break
+                        data = recvBytes.decode("utf-8")
                         print('RECV = {}'.format(data))
-                        if data == b'Lessons' or data == b'Lessons\r\n':
-                            json_string = self._dataBaseLessonsRequest()
-                        elif data == b'Exams' or data == b'Exams\r\n':
-                            json_string = self._dataBaseExamsRequest()
-                        elif data == b'Marks' or data == b'Marks\r\n':
-                            json_string = self._dataBaseMarksRequest()
-                        elif data == b'Events' or data == b'Events\r\n':
+                        request = Request(data)
+                        if request.request_name == 'Auth':
+                            json_string = self._dataBaseUserAuthentication(request)
+                        elif request.request_name == 'Lessons':
+                            json_string = self._dataBaseLessonsRequest(request)
+                        elif request.request_name == 'Exams':
+                            json_string = self._dataBaseExamsRequest(request)
+                        elif request.request_name == 'Marks':
+                            json_string = self._dataBaseMarksRequest(request)
+                        elif request.request_name == 'Events':
                             json_string = self._dataBaseEventsRequest()
-                        else:
-                            json_string = self._dataBaseUserAuthentication(data)
-                        print('SEND = {}'.format(json_string.encode()))
+                        print('SEND = {}'.format(json_string))
                         conn.send(json_string.encode())
                     except ConnectionError:
                         break
 
     @staticmethod
-    def _dataBaseUserAuthentication(data: str):
-        user = json.loads(data)
+    def _dataBaseUserAuthentication(request: Request):
         conn = None
         json_text = ""
         try:
@@ -53,7 +55,7 @@ class Server:
             cur = conn.cursor()
             columns = ('StudentLastname', 'StudentName', 'StudentPatronymic', 'StudentGroup', 'StudentDegree',
                        'StudentFormOfEducation', 'SpecialtyNumber', 'SpecialtyName')
-            cur.execute(open('sql_scripts/student_auth.sql').read().format(user['StudentLogin'], user['StudentPassword']))
+            cur.execute(open('sql_scripts/student_auth.sql').read().format(request.args[0], request.args[1]))
             results = []
 
             for row in cur.fetchall():
@@ -68,7 +70,7 @@ class Server:
         return json_text
 
     @staticmethod
-    def _dataBaseLessonsRequest():
+    def _dataBaseLessonsRequest(request: Request):
         conn = None
         json_text = ""
         try:
@@ -76,7 +78,7 @@ class Server:
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             columns = ('LessonDay', 'LessonTime', 'LessonType', 'ClassroomName', 'SubjectName')
-            cur.execute(open('sql_scripts/get_lessons.sql').read())
+            cur.execute(open('sql_scripts/get_lessons.sql').read().format(request.args[0]))
             results = []
 
             for row in cur.fetchall():
@@ -91,7 +93,7 @@ class Server:
         return json_text
 
     @staticmethod
-    def _dataBaseExamsRequest():
+    def _dataBaseExamsRequest(request: Request):
         conn = None
         json_text = ""
         try:
@@ -99,7 +101,7 @@ class Server:
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             columns = ('SubjectName', 'GroupName', 'ExamDate', 'ExamTime', 'ClassroomName')
-            cur.execute(open('sql_scripts/get_exams.sql').read())
+            cur.execute(open('sql_scripts/get_exams.sql').read().format(request.args[0]))
             results = []
 
             for row in cur.fetchall():
@@ -114,7 +116,7 @@ class Server:
         return json_text
 
     @staticmethod
-    def _dataBaseMarksRequest():
+    def _dataBaseMarksRequest(request: Request):
         conn = None
         json_text = ""
         try:
@@ -122,7 +124,7 @@ class Server:
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
             columns = ('StudentLastname', 'StudentName', 'StudentPatronymic', 'SubjectName', 'Grade')
-            cur.execute(open('sql_scripts/get_marks.sql').read().format('Тришин', 'Дмитрий', 'Александрович'))
+            cur.execute(open('sql_scripts/get_marks.sql').read().format(request.args[0], request.args[1], request.args[2]))
             results = []
 
             for row in cur.fetchall():
