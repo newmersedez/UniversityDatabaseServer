@@ -75,7 +75,7 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('lesson_day', 'lesson_time', 'lesson_type', 'classroom_name', 'subject_name')
+            columns = ('LessonDay', 'LessonTime', 'LessonType', 'ClassroomName', 'SubjectName')
             cur.execute(open('sql_scripts/get_lessons.sql').read())
             results = []
 
@@ -98,7 +98,7 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('subject_name', 'group_name', 'exam_date', 'exam_time', 'classroom_name')
+            columns = ('SubjectName', 'GroupName', 'ExamDate', 'ExamTime', 'ClassroomName')
             cur.execute(open('sql_scripts/get_exams.sql').read())
             results = []
 
@@ -121,7 +121,7 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('student_lastname', 'student_name', 'student_patronymic', 'subject_name', 'mark')
+            columns = ('StudentLastname', 'StudentName', 'StudentPatronymic', 'SubjectName', 'Grade')
             cur.execute(open('sql_scripts/get_marks.sql').read().format('Тришин', 'Дмитрий', 'Александрович'))
             results = []
 
@@ -144,7 +144,7 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('event_name', 'event_date', 'event_time', 'classroom_name', 'group_name')
+            columns = ('EventName', 'EventDate', 'EventTime', 'ClassroomName', 'GroupName')
             cur.execute(open('sql_scripts/get_events.sql').read())
             results = []
 
