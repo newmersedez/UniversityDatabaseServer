@@ -1,8 +1,8 @@
 from socket import socket, AF_INET, SOCK_STREAM
 from os import getpid
-from source.connect import *
 from source.request import *
-from types import SimpleNamespace
+import psycopg2
+from source.config import config
 import json
 
 
@@ -53,9 +53,17 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('StudentLastname', 'StudentName', 'StudentPatronymic', 'StudentGroup', 'StudentDegree',
-                       'StudentFormOfEducation', 'SpecialtyNumber', 'SpecialtyName')
-            cur.execute(open('sql_scripts/student_auth.sql').read().format(request.args[0], request.args[1]))
+            columns = ('StudentLastname',
+                       'StudentName',
+                       'StudentPatronymic',
+                       'StudentGroup',
+                       'StudentDegree',
+                       'StudentFormOfEducation',
+                       'SpecialtyNumber',
+                       'SpecialtyName')
+            cur.execute(open('sql_scripts/student_auth.sql').read().format(
+                request.args[0],
+                request.args[1]))
             results = []
 
             for row in cur.fetchall():
@@ -77,7 +85,11 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('LessonDay', 'LessonTime', 'LessonType', 'ClassroomName', 'SubjectName')
+            columns = ('LessonDay',
+                       'LessonTime',
+                       'LessonType',
+                       'ClassroomName',
+                       'SubjectName')
             cur.execute(open('sql_scripts/get_lessons.sql').read().format(request.args[0]))
             results = []
 
@@ -100,7 +112,11 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('SubjectName', 'GroupName', 'ExamDate', 'ExamTime', 'ClassroomName')
+            columns = ('SubjectName',
+                       'GroupName',
+                       'ExamDate',
+                       'ExamTime',
+                       'ClassroomName')
             cur.execute(open('sql_scripts/get_exams.sql').read().format(request.args[0]))
             results = []
 
@@ -123,8 +139,15 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('StudentLastname', 'StudentName', 'StudentPatronymic', 'SubjectName', 'Grade')
-            cur.execute(open('sql_scripts/get_marks.sql').read().format(request.args[0], request.args[1], request.args[2]))
+            columns = ('StudentLastname',
+                       'StudentName',
+                       'StudentPatronymic',
+                       'SubjectName',
+                       'Grade')
+            cur.execute(open('sql_scripts/get_marks.sql').read().format(
+                request.args[0],
+                request.args[1],
+                request.args[2]))
             results = []
 
             for row in cur.fetchall():
@@ -146,7 +169,11 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            columns = ('EventName', 'EventDate', 'EventTime', 'ClassroomName', 'GroupName')
+            columns = ('EventName',
+                       'EventDate',
+                       'EventTime',
+                       'ClassroomName',
+                       'GroupName')
             cur.execute(open('sql_scripts/get_events.sql').read())
             results = []
 
