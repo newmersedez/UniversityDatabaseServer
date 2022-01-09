@@ -270,12 +270,11 @@ class Server:
             params = config()
             conn = psycopg2.connect(**params)
             cur = conn.cursor()
-            cur.execute('UPDATE student SET student_login = \'{}\' WHERE student_id = \'{}\''.format(
+            cur.execute(open('sql_scripts/admin_change_login.sql').read().format(
                 str(request.args[1]),
                 request.args[0]))
             conn.commit()
             cur.close()
-            print('adhhdhdhdhhh')
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         finally:
@@ -294,7 +293,6 @@ class Server:
                 request.args[0]))
             conn.commit()
             cur.close()
-            print('adhhdhdhdhhh2382523756273653')
         except (Exception, psycopg2.DatabaseError) as error:
             print(error)
         finally:
